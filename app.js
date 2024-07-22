@@ -1,0 +1,43 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import { config } from './config.js';
+import { sequelize } from './db/database.js';
+import authRouter from './router/auth.js';
+
+const app = express();
+
+const corsOptions = {
+  origin: config.cors.allowedOrigin,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
+app.use(cookieParser());
+app.use(helmet());
+
+app.get('/', (req, res, next) => {
+  res.sendStatus(200);
+  return '서버 홈';
+});
+
+app.use('/auth', authRouter);
+
+app.use((req, res, next) => {
+  res.sendStatus(404);
+});
+
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.sendStatus(500);
+});
+
+sequelize
+  .sync()
+  .then(() => {
+    console.log('서버 열림');
+    app.listen(config.port.port);
+  })
+  .catch((err) => console.log(err));

@@ -1,0 +1,909 @@
+openapi: 3.0.3
+info:
+  title: 가계부 웹서비스
+  description: |-
+    가계부 작성을 도와주는 웹서비스 입니다. 
+    
+    Github Link : [가계부 웹서비스](https://github.com/2024-AISCHOOL-APP/JARINGOBI)
+    
+  version: 1.0.0
+
+  
+servers:
+  - url: http://localhost:8080
+  
+tags:
+  - name: Auth
+    description: 사용자에 대한 api
+  - name: Community
+    description: 커뮤니티에 대한 api
+  - name: Reply
+    description: 댓글에 대한 api
+  - name: AccountBook
+    description: 가계부에 대한 api
+  - name: Analyze
+    description: 분석/통계에 대한 api
+    
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - Auth
+      summary: 회원가입
+      operationId: authSignup
+      requestBody:
+        description: 회원가입
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id: 
+                  type: string
+                  example: example00
+                user_pw:
+                  type: string
+                  example: example00
+                user_name:
+                  type: string
+                  example: 홍길동
+                user_nick:
+                  type: string
+                  example: 닉네임
+                user_email:
+                  type: string
+                  example: johnDoe@example.com
+                user_addr:
+                  type: string
+                  example: 사랑시 고백구 행복동
+                user_gender:
+                  type: string
+                  example: 남성
+                user_balance:
+                  type: integer
+                  format: int64
+                  example: 1000000
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthApiResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                example:
+                  error: "Missing required fields"
+              examples:
+                missingFields:
+                  summary: Missing required fields
+                  value:
+                    error: "Missing required fields"
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                example:
+                  error: "Missing required fields"
+              examples:
+                emailOrUsernameExists:
+                  summary: Email or user_id already exists
+                  value:
+                    error: "Email or user_id already exists"
+                    
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: 로그인
+      operationId: authLogin
+      requestBody:
+        description: 로그인
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id: 
+                  type: string
+                  example: example00
+                user_pw:
+                  type: string
+                  example: example00
+        required: true
+      responses:
+        '200':
+          description: Login success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthApiResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                example:
+                  error: "Missing required fields"
+              examples:
+                missingFields:
+                  summary: Missing required fields
+                  value:
+                    error: "Missing required fields"
+                Invalid_credentials:
+                  summary: Invalid credentials
+                  value:
+                    error: "Invalid credentials"
+                    
+  /auth/user/{user_id}:
+    put:
+      tags:
+        - Auth
+      summary: 회원정보 수정
+      operationId: updateUser
+      parameters:
+        - name: user_id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 회원정보 수정
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_balance:
+                  type: integer
+                  format: int64
+                  example: 2000000
+      responses:
+        '200':
+          description: 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthApiResponse'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                example:
+                  error: "Authentication failed"
+                  
+  /community:
+    get:
+      tags:
+        - Community
+      summary: 커뮤니티 게시글 목록 조회
+      operationId: getCommunityPosts
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityApiResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+    post:
+      tags:
+        - Community
+      summary: 커뮤니티 게시글 작성
+      operationId: createCommunityPost
+      requestBody:
+        description: 게시글 작성
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_categoryId:
+                  type: integer
+                  format: int64
+                  example: 1
+                second_categoryId:
+                  type: integer
+                  format: int64
+                  example: 1
+                community_title:
+                  type: string
+                  example: 커뮤니티 제목
+                community_contents:
+                  type: string
+                  example: 게시글 내용
+        required: true
+      responses:
+        '201':
+          description: 생성 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Community'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+  /community/{community_id}:
+    get:
+      tags:
+        - Community
+      summary: 특정 커뮤니티 게시글 조회
+      operationId: getCommunityPost
+      parameters:
+        - name: community_id
+          in: path
+          description: 조회할 게시글 ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Community'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                example:
+                  error: "Authentication Error"
+              examples:
+                missingFields:
+                  summary: Authentication Error
+                  value:
+                    error: "Authentication Error"
+        '404':
+          description: Contents not fount
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                example:
+                  error: "Contents not fount"
+              examples:
+                missingFields:
+                  summary: Contents not fount
+                  value:
+                    error: "Contents not fount"
+    put:
+      tags:
+        - Community
+      summary: 커뮤니티 게시글 수정
+      operationId: updateCommunityPost
+      parameters:
+        - name: community_id
+          in: path
+          description: 수정할 커뮤니티 게시글 ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: user_id
+          in: query
+          description: 작성자 ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 게시글 수정
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Community'
+        required: true
+      responses:
+        '200':
+          description: 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Community'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+    delete:
+      tags:
+        - Community
+      summary: 커뮤니티 게시글 삭제
+      operationId: deleteCommunityPost
+      parameters:
+        - name: community_id
+          in: path
+          description: 삭제할 게시글 ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: 삭제 성공
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+
+  /reply:
+    get:
+      tags:
+        - Reply
+      summary: 댓글 목록 조회
+      operationId: getReplies
+      parameters:
+        - name: community_id
+          in: query
+          description: 조회할 게시글 ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentApiResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+        
+    post:
+      tags:
+        - Reply
+      summary: 댓글 작성
+      operationId: createReply
+      requestBody:
+        description: 댓글 작성
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+        required: true
+      responses:
+        '201':
+          description: 생성 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+  /reply/{reply_id}:
+    put:
+      tags:
+        - Reply
+      summary: 댓글 수정
+      operationId: updateReply
+      parameters:
+        - name: reply_id
+          in: path
+          description: 수정할 댓글 ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: user_id
+          in: query
+          description: 작성자 ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 댓글 수정
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+        required: true
+      responses:
+        '200':
+          description: 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+    delete:
+      tags:
+        - Reply
+      summary: 댓글 삭제
+      operationId: deleteReply
+      parameters:
+        - name: reply_id
+          in: path
+          description: 수정할 댓글 ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: user_id
+          in: query
+          description: 작성자 ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 삭제 성공
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+
+  /accountbook:
+    post:
+      tags:
+        - AccountBook
+      summary: 가계부 내역 작성
+      operationId: createAccountBook
+      requestBody:
+        description: 가계부 내역 작성
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account_Book'
+        required: true
+      responses:
+        '201':
+          description: 생성 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account_Book'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+  /accountbook/{accountBook_id}:
+    get:
+      tags:
+        - AccountBook
+      summary: 가계부 내역 조회
+      operationId: getAccountBook
+      parameters:
+        - name: accountBook_id
+          in: path
+          description: 조회할 가계부 ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account_Book'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+    put:
+      tags:
+        - AccountBook
+      summary: 가계부 내역 수정
+      operationId: updateAccountBook
+      parameters:
+        - name: accountBook_id
+          in: path
+          description: 수정할 가계부 ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: 가계부 내역 수정
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account_Book'
+        required: true
+      responses:
+        '200':
+          description: 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account_Book'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+    delete:
+      tags:
+        - AccountBook
+      summary: 가계부 내역 삭제
+      operationId: deleteAccountBook
+      parameters:
+        - name: accountBook_id
+          in: path
+          description: 삭제할 가계부 ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: 삭제 성공
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+                
+  /analyze/{user_id}:
+    get:
+      tags:
+        - Analyze
+      summary: 분성/통계 조회
+      operationId: getAnalyze
+      parameters:
+        - name: user_id
+          in: path
+          description: 분석/통계 조회
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 성공
+          
+        '204':
+          description: 통계를 낼 정보가 충분하지 않음
+        '403':
+          description: Authentication Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+                
+  
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        user_id: 
+          type: string
+          example: example00
+        user_pw:
+          type: string
+          example: example00
+        user_name:
+          type: string
+          example: 홍길동
+        user_nick:
+          type: string
+          example: 닉네임
+        user_email:
+          type: string
+          example: johnDoe@example.com
+        user_classification:
+          type: string
+          example: 사용자자
+        user_joinedAt:
+          type: string
+          format: date-time
+        user_addr:
+          type: string
+          example: 사랑시 고백구 행복동
+        user_gender:
+          type: string
+          example: 남성
+        user_balance:
+          type: integer
+          format: int64
+          example: 1000000
+        user_loginedAt:
+          type: string
+          format: date-time
+      required:
+        - user_id
+        - user_pw
+        - user_name
+        - user_nick
+        - user_email
+        - user_classification
+        - user_joinedAt
+        - user_addr
+        - user_gender
+        - user_balance
+        - user_loginedAt
+        
+    
+    Community:
+      type: object
+      properties:
+        community_id:
+          type: integer
+          format: int64
+          example: 1
+        user_id:
+          type: string
+          example: example00
+          description: User 테이블의 user_id
+        first_categoryId:
+          type: integer
+          format: int64
+          example: 1
+        second_categoryId:
+          type: integer
+          format: int64
+          example: 1
+        community_title:
+          type: string
+          example: 커뮤니티 제목
+        community_contents:
+          type: string
+          example: 게시글 내용
+        community_createDate:
+          type: string
+          format: date-time
+        community_editDate:
+          type: string
+          format: date-time
+      required:
+        - community_id
+        - user_id
+        - first_categoryId
+        - second_categoryId
+        - community_title
+        - community_contents
+        - community_createDate
+        - community_editDate
+          
+    Comment:
+      type: object
+      properties:
+        comment_id:
+          type: integer
+          format: int64
+          example: 1
+        community_id:
+          type: integer
+          format: int64
+          example: 1
+          description: Community 테이블의 community_id
+        user_id:
+          type: string
+          example: example00
+          description: User 테이블의 user_id
+        comment_contents:
+          type: string
+          example: 댓글내용
+        comment_createDate:
+          type: string
+          format: date-time
+        comment-editDate:
+          type: string
+          format: date-time
+      required:
+        - comment_id
+        - community_id
+        - user_id
+        - comment_contents
+        - comment_createDate
+        - editDate
+        
+    Like_Dislike:
+      type: object
+      properties:
+        like_id:
+          type: integer
+          format: int64
+          example: 1
+        target_id:
+          type: integer
+          format: int64
+          example: 1
+        target_type:
+          type: integer
+          format: int32
+          example: 1
+        user_id:
+          type: string
+          example: example00
+          description: User 테이블의 user_id
+        like_type:
+          type: integer
+          format: int32
+          example: 1
+        like_datetime:
+          type: string
+          format: date-time
+      required:
+        - like_id
+        - target_id
+        - target_type
+        - user_id
+        - like_type
+        - like_datetime
+          
+    Account_Book:
+      type: object
+      properties:
+        accountBook_id:
+          type: integer
+          format: int64
+          example: 1
+        user_id:
+          type: string
+          example: example00
+          description: User 테이블의 user_id
+        first_categoryId: 
+          type: integer
+          format: int64
+          example: 1
+        second_categoryId:
+          type: integer
+          format: int64
+          example: 1
+        accountBook_amount:
+          type: integer
+          format: int64
+          example: 1
+        accountBook_description:
+          type: string
+          example: 가계부 설명
+        accountBook_date:
+          type: string
+          format: date-time
+      required:
+        - accountBook_id
+        - user_id
+        - first_categoryId
+        - second_categoryId
+        - accountBook_amount
+        - accountBook_date
+        
+    AuthApiResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        user_id:
+          type: string
+          example: example00
+      required:
+        - token
+        - user_id
+        
+    ErrorApiResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Something went wrong"
+      required:
+        - message
+        
+    CommunityApiResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Community'
+          
+    CommentApiResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Comment'
+      
+    AccountbookApiResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Account_Book'
+        
+  securitySchemes:
+    jwt_auth:
+      description: Bearer token authorization with JWT
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    
+        
