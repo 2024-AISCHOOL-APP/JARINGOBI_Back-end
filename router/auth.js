@@ -7,14 +7,14 @@ import { isAuth } from '../middleware/auth.js';
 const router = express.Router();
 
 const validateCredential = [
-  body('user_id')
+  body('id')
     .trim()
     .notEmpty()
     .isLength({ min: 5 })
     .withMessage('아이디는 최소 5글자 이상이어야 함')
     .isAlphanumeric()
     .withMessage('아이디는 알파벳과 숫자만 포함해야 함.'),
-  body('user_pw')
+  body('pw')
     .trim()
     .isLength({ min: 5 })
     .withMessage('비밀번호는 최소 5자 이상이어야 함.')

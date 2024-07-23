@@ -10,21 +10,21 @@ const kakao = {
 };
 
 export async function signup(req, res) {
-  const { user_id, user_pw, user_name, user_nick, user_email, user_addr, user_gender } = req.body;
-  const found = await userRepository.findByUserId(user_id);
+  const { id, pw, name, nick, email, addr, gender } = req.body;
+  const found = await userRepository.findByUserId(id);
   if (found) {
-    return res.status(409).json({ message: `${user_id} already exists` });
+    return res.status(409).json({ message: `${id} already exists` });
   }
-  const hashed = await bcrypt.hash(user_pw, config.bcrypt.saltRounds);
+  const hashed = await bcrypt.hash(pw, config.bcrypt.saltRounds);
   const userId = await userRepository.createUser({
-    user_id,
-    user_pw: hashed,
-    user_name,
-    user_nick,
-    user_email,
-    user_addr,
-    user_gender,
-    user_classification: '사용자',
+    id,
+    pw: hashed,
+    name,
+    nick,
+    email,
+    addr,
+    gender,
+    classification: '사용자',
   });
 
   const token = createJwtToken(userId);
@@ -32,17 +32,17 @@ export async function signup(req, res) {
 }
 
 export async function login(req, res) {
-  const { user_id, user_pw } = req.body;
-  const user = await userRepository.findByUserId(user_id);
+  const { id, pw } = req.body;
+  const user = await userRepository.findByUserId(id);
   if (!user) {
     return res.status(401).json({ message: 'Invalid user or password' });
   }
-  const isValidPassword = await bcrypt.compare(user_pw, user.user_pw);
+  const isValidPassword = await bcrypt.compare(pw, user.pw);
   if (!isValidPassword) {
     return res.status(401).json({ message: 'Invalid user or password' });
   }
-  const token = createJwtToken(user.user_id);
-  res.status(200).json({ token, user_id });
+  const token = createJwtToken(user.id);
+  res.status(200).json({ token, id });
 }
 
 function createJwtToken(id) {
@@ -56,7 +56,6 @@ export async function kakaoLogin(req, res) {
   try {
     const tokenData = await getAccessToken(code);
     const userInfo = await getUserInfo(tokenData.access_token);
-    console.log(userInfo);
 
     const { data } = userInfo;
     const nickName = data.properties.nickname;
@@ -72,7 +71,6 @@ export async function kakaoLogin(req, res) {
     }
 
     const token = createJwtToken(kakaoId);
-    console.log(token);
     res.status(200).json({ token, kakaoId });
   } catch (error) {
     console.error('Error during kakao login process');

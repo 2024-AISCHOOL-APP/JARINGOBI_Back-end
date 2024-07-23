@@ -3,49 +3,49 @@ import { sequelize } from '../db/database.js';
 const DataTypes = SQ.DataTypes;
 
 export const User = sequelize.define('user', {
-  user_id: {
+  id: {
     type: DataTypes.STRING(128),
     allowNull: false,
     primaryKey: true,
   },
-  user_pw: {
+  pw: {
     type: DataTypes.STRING(128),
     allowNull: false,
   },
-  user_name: {
+  name: {
     type: DataTypes.STRING(128),
     allowNull: false,
   },
-  user_nick: {
+  nick: {
     type: DataTypes.STRING(128),
     allowNull: false,
   },
-  user_email: {
+  email: {
     type: DataTypes.STRING(128),
     allowNull: false,
   },
-  user_classification: {
+  classification: {
     type: DataTypes.STRING(128),
     allowNull: false,
   },
-  user_addr: {
+  addr: {
     type: DataTypes.STRING(128),
     allowNull: true,
   },
-  user_gender: {
+  gender: {
     type: DataTypes.STRING(50),
     allowNull: true,
   },
-  user_loginedAt: {
+  loginedAt: {
     type: DataTypes.DATE,
     allowNull: true,
   },
 });
 
-export async function findByUserId(user_id) {
-  return User.findOne({ where: { user_id } });
+export async function findByUserId(id) {
+  return User.findOne({ where: { id } });
 }
 
 export async function createUser(user) {
-  return User.create(user).then((data) => data.dataValues.user_id);
+  return User.create(user).then((data) => data.dataValues.id);
 }

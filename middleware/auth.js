@@ -19,8 +19,7 @@ export const isAuth = async (req, res, next) => {
   try {
     let payload = jwt.verify(token, config.jwt.secretKey);
     const user = await userRepository.findByUserId(payload.id);
-    req.userId = user.dataValues.user_id;
-    console.log(req.userId);
+    req.userId = user.dataValues.id;
     req.token = token;
     next();
   } catch (error) {

@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import { config } from './config.js';
 import { sequelize } from './db/database.js';
 import authRouter from './router/auth.js';
+import communityRouter from './router/community.js';
 import { kakaoLogin } from './controller/auth.js';
 
 const app = express();
@@ -26,6 +27,7 @@ app.get('/', (req, res, next) => {
 
 app.use('/auth', authRouter);
 app.get('/oauth/callback/kakao', kakaoLogin);
+app.use('/community', communityRouter);
 
 app.use((req, res, next) => {
   res.sendStatus(404);
