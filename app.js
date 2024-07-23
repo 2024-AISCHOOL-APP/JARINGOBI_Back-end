@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import { config } from './config.js';
 import { sequelize } from './db/database.js';
 import authRouter from './router/auth.js';
+import { kakaoLogin } from './controller/auth.js';
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.get('/', (req, res, next) => {
 });
 
 app.use('/auth', authRouter);
+app.get('/oauth/callback/kakao', kakaoLogin);
 
 app.use((req, res, next) => {
   res.sendStatus(404);
@@ -41,3 +43,13 @@ sequelize
     app.listen(config.port.port);
   })
   .catch((err) => console.log(err));
+
+process.on('SIGTERM', async () => {
+  await sequelize.close();
+  process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+  await sequelize.close();
+  process.exit(0);
+});
