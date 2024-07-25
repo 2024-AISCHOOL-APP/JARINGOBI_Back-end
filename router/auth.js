@@ -16,6 +16,7 @@ const validateCredential = [
     .withMessage('아이디는 알파벳과 숫자만 포함해야 함.'),
   body('pw')
     .trim()
+    .notEmpty()
     .isLength({ min: 5 })
     .withMessage('비밀번호는 최소 5자 이상이어야 함.')
     .matches(/[a-z]/)
