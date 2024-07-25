@@ -3,12 +3,13 @@ import { body } from 'express-validator';
 import { validate } from '../middleware/validator.js';
 import * as communityController from '../controller/community.js';
 import * as commentController from '../controller/comment.js';
+import * as likeController from '../controller/like.js';
 import { isAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
 const validateContent = [
-  body('title').trim().isLength({ min: 1 }).withMessage('제목은 한글자 이상이어야 함'),
+  body('title').trim().isLength({ min: 1 }).withMessage('제목은 한글자 이상이어야 함').notEmpty(),
   body('text').trim().isLength({ min: 1 }).withMessage('내용은 한글자 이상이어야 함').notEmpty(),
   validate,
 ];
@@ -24,5 +25,17 @@ router.delete('/:id', isAuth, communityController.deletePost);
 // 댓글
 router.get('/:id/comments', isAuth, commentController.getComments);
 router.post('/:id/comments', isAuth, validateComment, commentController.createComments);
+router.put('/:id/comments/:commentId', isAuth, validateComment, commentController.updateComment);
+router.delete('/:id/comments/:commentId', isAuth, commentController.deleteComment);
+
+// 게시물 좋아요
+router.post('/:id/like', isAuth, likeController.like);
+router.get('/:id/like', likeController.likeCount);
+router.delete('/:id/like', isAuth, likeController.deleteLike);
+
+// 댓글 좋아요
+router.post('/:id/comments/:commentId/like', isAuth, likeController.like);
+router.get('/:id/comments/:commentId/like', likeController.likeCount);
+router.delete('/:id/comments/:commentId/like', isAuth, likeController.deleteLike);
 
 export default router;
