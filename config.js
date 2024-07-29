@@ -1,4 +1,4 @@
-import dotenv, { parse } from 'dotenv';
+import dotenv from 'dotenv';
 dotenv.config({ path: './.env' });
 
 function required(key, defaultValue = undefined) {
@@ -11,7 +11,7 @@ function required(key, defaultValue = undefined) {
 
 export const config = {
   port: {
-    port: parseInt(required('PORT', 8085)),
+    port: parseInt(required('PORT', 8000)),
   },
   cors: {
     allowedOrigin: required('CORS_ALLOWED_ORIGIN'),

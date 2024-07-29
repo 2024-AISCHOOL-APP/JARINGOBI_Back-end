@@ -43,6 +43,7 @@ export async function login(req, res) {
   }
   const token = createJwtToken(user.id);
   res.status(200).json({ token, id });
+  console.log('로그인 성공!');
 }
 
 function createJwtToken(id) {
@@ -67,7 +68,7 @@ export async function kakaoLogin(req, res) {
     const user = await userRepository.findByUserId(kakaoId);
 
     if (!user) {
-      return res.json(userInfo); // 회원가입용
+      return res.status(204).json({ message: `존재하지 않는 회원입니다.` });
     }
 
     const token = createJwtToken(kakaoId);
@@ -104,6 +105,7 @@ const getAccessToken = async (code) => {
 };
 
 const getUserInfo = async (accessToken) => {
+  console.log(accessToken);
   const userInfoUrl = 'https://kapi.kakao.com/v2/user/me';
   try {
     const response = await axios.get(userInfoUrl, {

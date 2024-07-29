@@ -6,3 +6,50 @@ export async function createAccount(req, res) {
   const account = await accountRepository.create(userId, first, second, amount, description);
   res.status(201).json(account);
 }
+
+export async function getAccounts(req, res) {
+  const userId = req.userId;
+  const { year, month, day } = req.body;
+  const data = await (day ? accountRepository.getAllDateDay(userId, year, month, day) : accountRepository.getAllDate(userId, year, month));
+  res.status(200).json(data);
+}
+
+export async function getAccount(req, res) {
+  const userId = req.userId;
+  const accId = req.params.id;
+  const acc = await accountRepository.getById(accId, userId);
+  if (acc) {
+    res.status(200).json(acc);
+  } else {
+    res.status(404).json({ message: `Account id(${accId}) not found` });
+  }
+}
+
+export async function updateAccount(req, res) {
+  const userId = req.userId;
+  const accId = req.params.id;
+  const { first, second, amount, description } = req.body;
+  const acc = await accountRepository.getById(accId);
+  if (!acc) {
+    res.status(404).json({ message: `Account id(${accId}) not found` });
+  }
+  if (acc.userId !== userId) {
+    return res.sendStatus(403);
+  }
+  const updated = await accountRepository.update(accId, first, second, amount, description);
+  res.status(200).json(updated);
+}
+
+export async function deleteAccount(req, res) {
+  const userId = req.userId;
+  const accId = req.params.id;
+  const acc = await accountRepository.getById(accId);
+  if (!acc) {
+    res.status(404).json({ message: `Account id(${accId}) not found` });
+  }
+  if (acc.userId !== userId) {
+    return res.sendStatus(403);
+  }
+  await accountRepository.remove(accId);
+  res.sendStatus(204);
+}

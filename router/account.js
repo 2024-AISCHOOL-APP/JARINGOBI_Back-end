@@ -18,5 +18,9 @@ const validateAccount = [
 ];
 
 router.post('/', isAuth, validateAccount, accountController.createAccount);
+router.get('/', isAuth, accountController.getAccounts);
+router.get('/:id', isAuth, accountController.getAccount);
+router.put('/:id', isAuth, validateAccount, accountController.updateAccount);
+router.delete('/:id', isAuth, accountController.deleteAccount);
 
 export default router;
