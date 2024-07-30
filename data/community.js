@@ -30,7 +30,16 @@ export const Post = sequelize.define('post', {
 Post.belongsTo(User);
 
 const INCLUDE_USER = {
-  attributes: ['id', 'text', 'createdAt', 'userId', [Sequelize.col('user.name'), 'name'], [Sequelize.col('user.nick'), 'nickname']],
+  attributes: [
+    'id',
+    'title',
+    'tag',
+    'text',
+    'createdAt',
+    'userId',
+    [Sequelize.col('user.name'), 'name'],
+    [Sequelize.col('user.nick'), 'nickname'],
+  ],
   include: {
     model: User,
     attributes: [],
