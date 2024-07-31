@@ -2,6 +2,8 @@ import * as postsRepository from '../data/community.js';
 
 export async function getPosts(req, res) {
   const userId = req.query.userId;
+  console.log(req);
+  console.log(userId);
   const data = await (userId ? postsRepository.getAllByUserId(userId) : postsRepository.getAll());
   res.status(200).json(data);
 }

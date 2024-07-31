@@ -58,24 +58,14 @@ export async function kakaoLogin(req, res) {
     const tokenData = await getAccessToken(code);
     const userInfo = await getUserInfo(tokenData.access_token);
 
-    const { data } = userInfo;
-    const nickName = data.properties.nickname;
-    const email = data.kakao_account.email;
-    const kakaoId = data.id;
+    const id = userInfo.id;
+    const nickName = userInfo.properties.nickname;
+    const email = userInfo.kakao_account.email;
 
-    if (!nickName || !email || !kakaoId) throw new Error('KEY_ERROR', 400);
-
-    const user = await userRepository.findByUserId(kakaoId);
-
-    if (!user) {
-      return res.status(204).json({ message: `존재하지 않는 회원입니다.` });
-    }
-
-    const token = createJwtToken(kakaoId);
-    res.status(200).json({ token, kakaoId });
+    const token = createJwtToken(id);
+    res.status(200).json({ token, id, nickName, email });
   } catch (error) {
     console.error('Error during kakao login process');
-    res.status(500).send('Error during kakao login process');
   }
 }
 
@@ -105,7 +95,6 @@ const getAccessToken = async (code) => {
 };
 
 const getUserInfo = async (accessToken) => {
-  console.log(accessToken);
   const userInfoUrl = 'https://kapi.kakao.com/v2/user/me';
   try {
     const response = await axios.get(userInfoUrl, {
@@ -125,19 +114,4 @@ export async function me(req, res) {
     return res.status(404).json({ message: 'User not found' });
   }
   res.status(200).json({ token: req.token, userId: req.userId });
-}
-
-export async function logout(req, res) {
-  setToken(res, '');
-  res.sendStatus(200).json({ message: 'Logged out' });
-}
-
-function setToken(res, token) {
-  const options = {
-    httpOnly: true,
-    sameSite: 'none',
-    secure: true,
-    maxAge: config.jwt.expiresInSec * 1000,
-  };
-  res.cookie('token', token, options);
 }
