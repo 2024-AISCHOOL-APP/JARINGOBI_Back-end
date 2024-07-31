@@ -42,7 +42,7 @@ export async function login(req, res) {
     return res.status(401).json({ message: 'Invalid user or password' });
   }
   const token = createJwtToken(user.id);
-  res.status(200).json({ token, id });
+  res.status(200).json({ token, id, user });
   console.log('로그인 성공!');
 }
 

@@ -9,8 +9,14 @@ export async function createAccount(req, res) {
 
 export async function getAccounts(req, res) {
   const userId = req.userId;
-  const { year, month, day } = req.body;
-  const data = await (day ? accountRepository.getAllDateDay(userId, year, month, day) : accountRepository.getAllDate(userId, year, month));
+  let year = req.query.year;
+  let month = req.query.month;
+  const data = await (
+    month ? 
+    accountRepository.getAllDateMonth(userId, year, month) 
+    : 
+    accountRepository.getAllDateYear(userId, year)
+  );
   res.status(200).json(data);
 }
 
