@@ -1,0 +1,25 @@
+{
+    "storeName": "나주곰탕",
+    "storeAddress": [
+        "충북 청주시 청원구 오창읍 중심상업1로 8 -9 (양청리) 1층"
+    ],
+    "storeTel": [
+        "043-212-8833"
+    ],
+    "items": [
+        {
+            "product_name": "(특)바우네곰탕",
+            "count": "9",
+            "unit_price": "12,000",
+            "total_price": "108,000"
+        },
+        {
+            "product_name": "매콤곰탕",
+            "count": "1",
+            "unit_price": "10,000",
+            "total_price": "10,000"
+        }
+    ],
+    "totalPrice": "118,000",
+    "taxPrice": "10,727"
+}
