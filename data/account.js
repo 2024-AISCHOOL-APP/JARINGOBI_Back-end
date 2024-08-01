@@ -31,28 +31,28 @@ const Account = sequelize.define('account', {
   title: {
     type: DataTypes.TEXT,
     allowNull: true,
-  },
+  },  
 });
 
 Account.belongsTo(User);
 
-export async function create(userId, first_category, second_category, amount, description) {
-  return Account.create({ userId, first_category, second_category, amount, description }).then((data) => {
+export async function create(userId, first_category, second_category, amount, description, title) {
+  return Account.create({ userId, first_category, second_category, amount, description, title }).then((data) => {
     return data;
   });
 }
 
 export async function getAllDateYear(userId, year) {
   const startDate = moment(`${year}`, 'YYYY')
-  .startOf('year')
-  .startOf('month')
-  .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-  .toDate();
+    .startOf('year')
+    .startOf('month')
+    .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+    .toDate();
   const endDate = moment(`${year}`, 'YYYY')
-  .endOf('year')
-  .endOf('month')
-  .set({ hour: 23, minute: 59, second: 59, millisecond: 999 })
-  .toDate();
+    .endOf('year')
+    .endOf('month')
+    .set({ hour: 23, minute: 59, second: 59, millisecond: 999 })
+    .toDate();
   return Account.findAll({
     where: {
       userId,
@@ -67,13 +67,13 @@ export async function getAllDateYear(userId, year) {
 
 export async function getAllDateMonth(userId, year, month) {
   const startDate = moment(`${year}-${month}`, 'YYYY-MM')
-  .startOf('month')
-  .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-  .toDate();
+    .startOf('month')
+    .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+    .toDate();
   const endDate = moment(`${year}-${month}`, 'YYYY-MM')
-  .endOf('month')
-  .set({ hour: 23, minute: 59, second: 59, millisecond: 999 })
-  .toDate();
+    .endOf('month')
+    .set({ hour: 23, minute: 59, second: 59, millisecond: 999 })
+    .toDate();
   return Account.findAll({
     where: {
       userId,
@@ -90,8 +90,8 @@ export async function getAllDateMonth(userId, year, month) {
 
 export async function getAllDateDay(userId, year, month, day) {
   const targetDate = moment(`${year}-${month}-${day}`);
-  const startDate = targetDate.startOf('day').toDate();
-  const endDate = targetDate.endOf('day').toDate();
+  const startDate = targetDate.clone().set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).format('YYYY-MM-DD HH:mm:ss');
+  const endDate = targetDate.clone().set({ hour: 23, minute: 59, second: 59, millisecond: 999 }).format('YYYY-MM-DD HH:mm:ss');
   return Account.findAll({
     where: {
       userId,
@@ -110,12 +110,13 @@ export async function getById(id) {
   });
 }
 
-export async function update(id, first, second, amount, description) {
+export async function update(id, first, second, amount, description, title) {
   return Account.findByPk(id).then((acc) => {
     acc.first_category = first;
     acc.second_category = second;
     acc.amount = amount;
     acc.description = description;
+    acc.title = title;
     return acc.save();
   });
 }
