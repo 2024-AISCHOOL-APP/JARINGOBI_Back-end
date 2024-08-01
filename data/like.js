@@ -25,40 +25,75 @@ Like.belongsTo(Post, { foreignKey: 'postId' });
 Like.belongsTo(Comment, { foreignKey: 'commentId' });
 
 export async function existingLike(postId, userId, commentId) {
-  return Like.findOne({
-    where: {
-      postId,
-      userId,
-      commentId,
-    },
-  });
+  if (commentId) {
+    return Like.findOne({
+      where: {
+        postId,
+        userId,
+        commentId,
+      },
+    });
+  } else {
+    return Like.findOne({
+      where: {
+        postId,
+        userId,
+      },
+    });
+  }
 }
 
 export async function addLike(postId, userId, commentId) {
-  return Like.create({
-    postId,
-    userId,
-    commentId,
-  }).then((data) => {
-    return data;
-  });
-}
-
-export async function likeCount(postId, commentId) {
-  return Like.count({
-    where: {
-      postId,
-      commentId,
-    },
-  });
-}
-
-export async function remove(postId, userId, commentId) {
-  return Like.findOne({
-    where: {
+  if (commentId) {
+    return Like.create({
       postId,
       userId,
       commentId,
-    },
-  }).then((like) => like.destroy());
+    }).then((data) => {
+      return data;
+    });
+  } else {
+    return Like.create({
+      postId,
+      userId,
+    }).then((data) => {
+      return data;
+    });
+  }
+}
+
+export async function likeCount(postId, commentId) {
+  if (commentId) {
+    return Like.count({
+      where: {
+        postId,
+        commentId,
+      },
+    });
+  } else {
+    return Like.count({
+      where: {
+        postId,
+      },
+    });
+  }
+}
+
+export async function remove(postId, userId, commentId) {
+  if (commentId) {
+    return Like.findOne({
+      where: {
+        postId,
+        userId,
+        commentId,
+      },
+    }).then((like) => like.destroy());
+  } else {
+    return Like.findOne({
+      where: {
+        postId,
+        userId,
+      },
+    }).then((like) => like.destroy());
+  }
 }

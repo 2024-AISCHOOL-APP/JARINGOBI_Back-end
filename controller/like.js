@@ -15,8 +15,13 @@ export async function like(req, res) {
 
 export async function likeCount(req, res) {
   const postId = parseInt(req.params.id, 10);
-  const commentId = parseInt(req.params.commentId, 10);
-  const likeCount = await likeRepository.likeCount(postId, commentId);
+  const commentId = req.params.commentId;
+  let likeCount;
+  if (commentId) {
+    commentId = parseInt(req.params.commentId, 10);
+    likeCount = await likeRepository.likeCount(postId, commentId);
+  }
+  likeCount = await likeRepository.likeCount(postId);
   res.status(200).json(likeCount);
 }
 
